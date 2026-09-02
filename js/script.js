@@ -27,6 +27,13 @@ const cancelEditBtn = document.getElementById('cancelEditBtn');
 const formHeading = document.getElementById('form-heading');
 const editingBadge = document.getElementById('editingBadge');
 
+// Places where the validation messages are shown
+const typeError = document.getElementById('typeError');
+const amountError = document.getElementById('amountError');
+const categoryError = document.getElementById('categoryError');
+const dateError = document.getElementById('dateError');
+const descriptionError = document.getElementById('descriptionError');
+
 // Summary elements
 const totalIncomeBox = document.getElementById('totalIncome');
 const totalExpenseBox = document.getElementById('totalExpense');
@@ -425,9 +432,132 @@ function getSelectedType() {
   return '';
 }
 
+function clearFormErrors() {
+  const errorBoxes = document.querySelectorAll('.form-error');
+  for (let i = 0; i < errorBoxes.length; i++) {
+    errorBoxes[i].textContent = '';
+  }
+
+  const inputs = [amountInput, categoryInput, dateInput, descriptionInput];
+  for (let i = 0; i < inputs.length; i++) {
+    inputs[i].classList.remove('is-invalid');
+    inputs[i].removeAttribute('aria-invalid');
+  }
+}
+
+function showFieldError(errorBox, input, message) {
+  errorBox.textContent = message;
+
+  if (input !== null) {
+    input.classList.add('is-invalid');
+    input.setAttribute('aria-invalid', 'true');
+  }
+}
+
+// Checks every field and shows a message for each problem it finds
+function validateForm() {
+  clearFormErrors();
+
+  let isValid = true;
+  let firstInvalidField = null;
+
+  if (getSelectedType() === '') {
+    showFieldError(typeError, null, 'Please select a transaction type.');
+    if (firstInvalidField === null) {
+      firstInvalidField = typeInputs[0];
+    }
+    isValid = false;
+  }
+
+  const amountText = amountInput.value.trim();
+  const amount = Number(amountText);
+  let amountMessage = '';
+
+  if (amountText === '') {
+    amountMessage = 'Please enter an amount.';
+  } else if (isNaN(amount)) {
+    amountMessage = 'Please enter a valid number.';
+  } else if (amount <= 0) {
+    amountMessage = 'Amount must be greater than 0.';
+  }
+
+  if (amountMessage !== '') {
+    showFieldError(amountError, amountInput, amountMessage);
+    if (firstInvalidField === null) {
+      firstInvalidField = amountInput;
+    }
+    isValid = false;
+  }
+
+  if (categoryInput.value === '') {
+    showFieldError(categoryError, categoryInput, 'Please select a category.');
+    if (firstInvalidField === null) {
+      firstInvalidField = categoryInput;
+    }
+    isValid = false;
+  }
+
+  if (dateInput.value === '') {
+    showFieldError(dateError, dateInput, 'Please select a date.');
+    if (firstInvalidField === null) {
+      firstInvalidField = dateInput;
+    }
+    isValid = false;
+  }
+
+  if (descriptionInput.value.trim() === '') {
+    showFieldError(descriptionError, descriptionInput, 'Please enter a description.');
+    if (firstInvalidField === null) {
+      firstInvalidField = descriptionInput;
+    }
+    isValid = false;
+  }
+
+  if (firstInvalidField !== null) {
+    firstInvalidField.focus();
+  }
+
+  return isValid;
+}
+
+function addTransaction() {
+  const newTransaction = {
+    id: Date.now().toString(),
+    type: getSelectedType(),
+    amount: Number(amountInput.value),
+    category: categoryInput.value,
+    date: dateInput.value,
+    description: descriptionInput.value.trim(),
+    createdAt: new Date().toISOString()
+  };
+
+  transactions.push(newTransaction);
+  saveTransactions();
+  console.log('New transaction saved');
+}
+
+function resetForm() {
+  transactionForm.reset();
+  clearFormErrors();
+  populateCategoryOptions('');
+  dateInput.value = getTodayAsInputValue();
+}
+
+function handleFormSubmit(event) {
+  event.preventDefault();
+
+  if (validateForm() === false) {
+    return;
+  }
+
+  addTransaction();
+  resetForm();
+  render();
+}
+
 function init() {
   transactions = loadTransactions();
-  console.log('Transactions loaded from local storage: ' + transactions.length);
+  console.log('Loaded ' + transactions.length + ' saved transactions');
 
   dateInput.value = getTodayAsInputValue();
   populateCategoryOptions('');
@@ -439,8 +569,10 @@ function init() {
     });
   }
 
+  transactionForm.addEventListener('submit', handleFormSubmit);
+
   render();
-  console.log('Spendly initialized');
+  console.log('Spendly is up and running');
 }
 
 init();
