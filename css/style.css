@@ -1,0 +1,473 @@
+:root {
+  --app-bg: #f4f6f9;
+  --surface: #ffffff;
+  --surface-muted: #f8fafc;
+  --border: #e3e8ef;
+  --text: #16202f;
+  --text-muted: #64748b;
+  --brand: #1e3a5f;
+  --accent: #2563eb;
+  --accent-dark: #1d4ed8;
+  --income: #15803d;
+  --income-soft: #e8f6ed;
+  --expense: #b42318;
+  --expense-soft: #fdecea;
+  --radius: 12px;
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --shadow-md: 0 6px 20px rgba(16, 24, 40, 0.07);
+}
+
+body {
+  background-color: var(--app-bg);
+  color: var(--text);
+  font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.95rem;
+}
+
+:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.45);
+  outline-offset: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+}
+
+.skip-link:focus {
+  left: 1rem;
+  top: 1rem;
+  z-index: 1080;
+  background-color: var(--surface);
+  color: var(--text);
+  padding: 0.5rem 0.85rem;
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+}
+
+/* Header */
+.app-header {
+  background-color: var(--brand);
+  color: #ffffff;
+  padding: 0.9rem 0;
+}
+
+.app-header__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem 1rem;
+}
+
+.app-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.app-header__tagline {
+  margin: 0;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* Summary cards */
+.summary-card {
+  height: 100%;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--text-muted);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 1rem 1.25rem;
+}
+
+.summary-card__label {
+  margin: 0 0 0.3rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.summary-card__value {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.summary-card--income {
+  border-left-color: var(--income);
+}
+
+.summary-card--income .summary-card__value {
+  color: var(--income);
+}
+
+.summary-card--expense {
+  border-left-color: var(--expense);
+}
+
+.summary-card--expense .summary-card__value {
+  color: var(--expense);
+}
+
+.summary-card--balance {
+  border-left-color: var(--accent);
+}
+
+.summary-card--balance .summary-card__value {
+  color: var(--brand);
+}
+
+.summary-card__value.is-negative {
+  color: var(--expense);
+}
+
+/* Panels */
+.panel {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.9rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.panel__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.panel__body {
+  padding: 1.25rem;
+}
+
+.panel__body--flush {
+  padding: 0;
+}
+
+.count-pill,
+.status-pill {
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.2rem 0.65rem;
+  white-space: nowrap;
+}
+
+.count-pill {
+  background-color: var(--surface-muted);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.status-pill {
+  background-color: #fff4e5;
+  border: 1px solid #f5c68a;
+  color: #92400e;
+}
+
+/* Form */
+.form-label {
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-bottom: 0.35rem;
+}
+
+legend.form-label {
+  float: none;
+  width: auto;
+}
+
+.type-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.btn-type {
+  background-color: var(--surface-muted);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.btn-type:hover {
+  background-color: #eef2f7;
+  color: var(--text);
+}
+
+.btn-check:checked + .btn-type--income {
+  background-color: var(--income-soft);
+  border-color: var(--income);
+  color: var(--income);
+}
+
+.btn-check:checked + .btn-type--expense {
+  background-color: var(--expense-soft);
+  border-color: var(--expense);
+  color: var(--expense);
+}
+
+.btn-check:focus-visible + .btn-type {
+  outline: 3px solid rgba(37, 99, 235, 0.45);
+  outline-offset: 2px;
+}
+
+.form-control,
+.form-select {
+  border-color: var(--border);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.15);
+}
+
+.input-group-text {
+  background-color: var(--surface-muted);
+  border-color: var(--border);
+  color: var(--text-muted);
+}
+
+.form-error {
+  margin: 0.35rem 0 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--expense);
+}
+
+.form-error:empty {
+  display: none;
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.form-actions .btn {
+  flex: 1 1 10rem;
+}
+
+.btn-primary {
+  --bs-btn-bg: var(--accent);
+  --bs-btn-border-color: var(--accent);
+  --bs-btn-hover-bg: var(--accent-dark);
+  --bs-btn-hover-border-color: var(--accent-dark);
+  --bs-btn-active-bg: #1e40af;
+  --bs-btn-active-border-color: #1e40af;
+  font-weight: 600;
+}
+
+/* Filters */
+.filters {
+  padding: 0.85rem 1.25rem;
+  background-color: var(--surface-muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.filters__field {
+  flex: 1 1 10rem;
+  min-width: 9rem;
+}
+
+.form-label-sm {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 0.2rem;
+}
+
+/* Transaction table */
+.transaction-table {
+  --bs-table-bg: transparent;
+  margin-bottom: 0;
+}
+
+.transaction-table thead th {
+  background-color: var(--surface-muted);
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+  padding: 0.7rem 1rem;
+  white-space: nowrap;
+}
+
+.transaction-table tbody td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.transaction-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.transaction-description {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.transaction-date {
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.category-tag {
+  display: inline-block;
+  background-color: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.type-badge {
+  display: inline-block;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.15rem 0.6rem;
+}
+
+.type-badge--income {
+  background-color: var(--income-soft);
+  border-color: rgba(21, 128, 61, 0.3);
+  color: var(--income);
+}
+
+.type-badge--expense {
+  background-color: var(--expense-soft);
+  border-color: rgba(180, 35, 24, 0.3);
+  color: var(--expense);
+}
+
+.transaction-amount {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.transaction-amount--income {
+  color: var(--income);
+}
+
+.transaction-amount--expense {
+  color: var(--expense);
+}
+
+.row-actions {
+  display: flex;
+  gap: 0.4rem;
+  justify-content: flex-end;
+}
+
+/* Empty state */
+.empty-state {
+  margin: 1.25rem;
+  padding: 2.25rem 1.25rem;
+  text-align: center;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  background-color: var(--surface-muted);
+}
+
+.empty-state__title {
+  margin: 0 0 0.25rem;
+  font-weight: 600;
+}
+
+.empty-state__hint {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+@media (min-width: 992px) {
+  .form-panel {
+    position: sticky;
+    top: 1.5rem;
+  }
+}
+
+/* Stacked card layout for small screens */
+@media (max-width: 767.98px) {
+  .transaction-table thead {
+    display: none;
+  }
+
+  .transaction-table,
+  .transaction-table tbody,
+  .transaction-table tr,
+  .transaction-table td {
+    display: block;
+  }
+
+  /* Width is left to the block layout: a fixed 100% would push the row past its panel. */
+  .transaction-table tr {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.75rem 0.9rem;
+    margin: 0.75rem 1rem;
+    background-color: var(--surface);
+  }
+
+  .transaction-table tbody td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.3rem 0;
+    border-bottom: 0;
+  }
+
+  .transaction-table tbody td::before {
+    content: attr(data-label);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    flex: 0 0 auto;
+  }
+
+  .transaction-table tbody td.text-end {
+    text-align: left !important;
+  }
+
+  .row-actions .btn {
+    min-width: 4.75rem;
+  }
+
+  .summary-card__value {
+    font-size: 1.45rem;
+  }
+}
