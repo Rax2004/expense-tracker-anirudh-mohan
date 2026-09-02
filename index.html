@@ -205,6 +205,41 @@
         </section>
       </div>
     </div>
+    <div class="row g-4 mt-0">
+      <div class="col-12 col-xl-4">
+        <section class="panel" aria-labelledby="monthly-heading">
+          <div class="panel__header">
+            <h2 class="panel__title" id="monthly-heading">Monthly Expenses</h2>
+          </div>
+          <div class="panel__body">
+            <div class="month-figures">
+              <div class="month-figure">
+                <p class="month-figure__label" id="currentMonthLabel">This month</p>
+                <p class="month-figure__value" id="currentMonthExpense">&#8377;0.00</p>
+              </div>
+              <div class="month-figure">
+                <p class="month-figure__label" id="previousMonthLabel">Last month</p>
+                <p class="month-figure__value" id="previousMonthExpense">&#8377;0.00</p>
+              </div>
+            </div>
+            <p class="month-note" id="monthComparison">No expenses recorded yet.</p>
+          </div>
+        </section>
+      </div>
+
+      <div class="col-12 col-xl-8">
+        <section class="panel" aria-labelledby="chart-heading">
+          <div class="panel__header">
+            <h2 class="panel__title" id="chart-heading">Spending by Category</h2>
+            <span class="count-pill">All expenses</span>
+          </div>
+          <div class="panel__body">
+            <ul class="chart" id="categoryChart"></ul>
+            <p class="chart-empty d-none" id="chartEmpty">No expenses to show yet.</p>
+          </div>
+        </section>
+      </div>
+    </div>
   </main>
 
   <footer class="app-footer">

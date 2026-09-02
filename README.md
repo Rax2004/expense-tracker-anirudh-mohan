@@ -6,9 +6,6 @@ so the data is still there the next time you open the page. No login, no server,
 
 Track · Control · Grow - Every Rupee Counts!
 
-**Status:** all the main features are working. What is left is the optional extras (a monthly
-summary and a category chart) and a final tidy up.
-
 ## What it does
 
 - Add an entry as income or expense with an amount, category, date and a short description
@@ -24,10 +21,16 @@ summary and a category chart) and a final tidy up.
   filter has no matches
 - Broken or missing local storage data is ignored instead of crashing the page
 
+Two extras on top of that:
+
+- **Monthly expenses** - this month against last month, with the difference written out
+- **Spending by category** - a bar chart of where the money went, built with plain HTML and CSS
+  rather than a chart library, and redrawn whenever a transaction is added, edited or deleted
+
 ## Built with
 
 - HTML5 and CSS3
-- Bootstrap 5 (grid, forms, buttons) loaded from a CDN
+- Bootstrap 5 (grid, forms, buttons, the confirmation dialog) loaded from a CDN
 - Plain JavaScript, no framework and no build step
 - Local storage for saving the data
 
@@ -36,29 +39,7 @@ Amounts are shown in rupees. If you want a different currency, `formatCurrency()
 
 ## Running it
 
-Download or clone the folder and open `index.html` in any modern browser. That is enough.
-
-If you prefer to serve it over http (closer to how it would actually run), any static server does
-the job. With Python installed:
-
-```bash
-python -m http.server 8000
-```
-
-Then open `http://localhost:8000`.
-
-## Files
-
-```text
-index.html      the whole page: summary cards, the form, the filters and the transaction table
-css/style.css   my styling on top of Bootstrap, including the table to card switch for phones
-js/script.js    all the logic: state, local storage, calculations, rendering
-assets/         the Spendly mark, also used as the favicon
-```
-
-I kept the JavaScript in one file with small functions (`loadTransactions`, `saveTransactions`,
-`calculateSummary`, `renderTransactions`, and so on) instead of splitting it into modules. For a
-project this size it is easier to follow, and I can explain every part of it.
+Download or clone the folder and open `index.html` in any browser. There is nothing to install.
 
 ## How the data is saved
 
@@ -67,9 +48,22 @@ key `expenseTrackerTransactions` using `JSON.stringify()`. On page load it is re
 `JSON.parse()` inside a `try / catch`, and every record is checked before it is used, so a missing
 key or edited/broken data just gives you an empty list instead of a broken page.
 
-## What I would add next
+Each transaction looks like this:
 
-- Export to CSV
-- A search box for descriptions
-- Monthly budget limits with a warning when a category gets close
-- A simple category chart drawn on a canvas
+```json
+{
+  "id": "1788369588254",
+  "type": "expense",
+  "amount": 1250.5,
+  "category": "Food",
+  "date": "2026-09-02",
+  "description": "Groceries for the week",
+  "createdAt": "2026-09-02T17:19:48.254Z"
+}
+```
+
+## Accessibility
+
+Labels on every field, buttons with real text, a visible focus ring, a skip link, and the totals sit
+in polite live regions so a screen reader hears them change. Income and expense are not told apart
+by colour alone - each row also carries a text badge and a + or - in front of the amount.

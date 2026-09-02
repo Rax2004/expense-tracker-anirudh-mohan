@@ -51,6 +51,15 @@ const emptyState = document.getElementById('emptyState');
 const emptyStateHint = document.getElementById('emptyStateHint');
 const transactionCount = document.getElementById('transactionCount');
 
+// Monthly summary and chart elements
+const currentMonthLabel = document.getElementById('currentMonthLabel');
+const currentMonthExpense = document.getElementById('currentMonthExpense');
+const previousMonthLabel = document.getElementById('previousMonthLabel');
+const previousMonthExpense = document.getElementById('previousMonthExpense');
+const monthComparison = document.getElementById('monthComparison');
+const categoryChart = document.getElementById('categoryChart');
+const chartEmpty = document.getElementById('chartEmpty');
+
 // Filter elements
 const filterTypeInputs = document.querySelectorAll('input[name="filterType"]');
 const filterCategory = document.getElementById('filterCategory');
@@ -88,18 +97,18 @@ function formatDate(dateValue) {
   return day + ' ' + monthName + ' ' + year;
 }
 
+function padTwoDigits(value) {
+  if (value < 10) {
+    return '0' + value;
+  }
+  return String(value);
+}
+
 function getTodayAsInputValue() {
   const today = new Date();
   const year = today.getFullYear();
-  let month = today.getMonth() + 1;
-  let day = today.getDate();
-
-  if (month < 10) {
-    month = '0' + month;
-  }
-  if (day < 10) {
-    day = '0' + day;
-  }
+  const month = padTwoDigits(today.getMonth() + 1);
+  const day = padTwoDigits(today.getDate());
 
   return year + '-' + month + '-' + day;
 }
@@ -107,6 +116,9 @@ function getTodayAsInputValue() {
 // Used when reading local storage, so broken records are never shown
 function isValidTransaction(record) {
   if (record === null || typeof record !== 'object') {
+    return false;
+  }
+  if (record.id === undefined || record.id === null || record.id === '') {
     return false;
   }
   if (record.type !== 'income' && record.type !== 'expense') {
@@ -121,7 +133,8 @@ function isValidTransaction(record) {
   if (typeof record.category !== 'string' || record.category === '') {
     return false;
   }
-  if (typeof record.date !== 'string' || record.date.length !== 10) {
+  // The date has to look like 2026-09-02, otherwise it cannot be displayed
+  if (typeof record.date !== 'string' || /^\d{4}-\d{2}-\d{2}$/.test(record.date) === false) {
     return false;
   }
   if (typeof record.description !== 'string' || record.description === '') {
@@ -156,7 +169,7 @@ function loadTransactions() {
           category: record.category,
           date: record.date,
           description: record.description,
-          createdAt: record.createdAt
+          createdAt: record.createdAt || ''
         });
       }
     }
@@ -199,6 +212,13 @@ function calculateSummary() {
     incomeEntries: incomeEntries,
     expenseEntries: expenseEntries
   };
+}
+
+function getTransactionCountText(count) {
+  if (count === 1) {
+    return '1 transaction';
+  }
+  return count + ' transactions';
 }
 
 function getEntryCountText(count) {
@@ -367,19 +387,167 @@ function renderTransactions() {
   }
 
   if (visibleTransactions.length === transactions.length) {
-    if (transactions.length === 1) {
-      transactionCount.textContent = '1 transaction';
-    } else {
-      transactionCount.textContent = transactions.length + ' transactions';
-    }
+    transactionCount.textContent = getTransactionCountText(transactions.length);
   } else {
     transactionCount.textContent = visibleTransactions.length + ' of ' + transactions.length + ' shown';
+  }
+}
+
+// A stored date looks like 2026-09-02, so the first seven characters are the month
+function getMonthKey(dateValue) {
+  return dateValue.slice(0, 7);
+}
+
+function getMonthLabel(monthKey) {
+  const year = monthKey.split('-')[0];
+  const month = Number(monthKey.split('-')[1]);
+  return MONTH_NAMES[month - 1] + ' ' + year;
+}
+
+function getPreviousMonthKey(monthKey) {
+  let year = Number(monthKey.split('-')[0]);
+  let month = Number(monthKey.split('-')[1]);
+
+  if (month === 1) {
+    month = 12;
+    year = year - 1;
+  } else {
+    month = month - 1;
+  }
+
+  return year + '-' + padTwoDigits(month);
+}
+
+function getExpenseTotalForMonth(monthKey) {
+  let total = 0;
+
+  for (let i = 0; i < transactions.length; i++) {
+    const transaction = transactions[i];
+
+    if (transaction.type === 'expense' && getMonthKey(transaction.date) === monthKey) {
+      total = total + transaction.amount;
+    }
+  }
+
+  return total;
+}
+
+function renderMonthlySummary() {
+  const thisMonth = getMonthKey(getTodayAsInputValue());
+  const lastMonth = getPreviousMonthKey(thisMonth);
+  const thisMonthTotal = getExpenseTotalForMonth(thisMonth);
+  const lastMonthTotal = getExpenseTotalForMonth(lastMonth);
+
+  currentMonthLabel.textContent = getMonthLabel(thisMonth);
+  previousMonthLabel.textContent = getMonthLabel(lastMonth);
+  currentMonthExpense.textContent = formatCurrency(thisMonthTotal);
+  previousMonthExpense.textContent = formatCurrency(lastMonthTotal);
+
+  if (thisMonthTotal === 0 && lastMonthTotal === 0) {
+    monthComparison.textContent = 'No expenses recorded for either month.';
+  } else if (lastMonthTotal === 0) {
+    monthComparison.textContent = 'Nothing recorded in ' + getMonthLabel(lastMonth) + ' to compare with.';
+  } else if (thisMonthTotal > lastMonthTotal) {
+    monthComparison.textContent = formatCurrency(thisMonthTotal - lastMonthTotal) + ' more than last month.';
+  } else if (thisMonthTotal < lastMonthTotal) {
+    monthComparison.textContent = formatCurrency(lastMonthTotal - thisMonthTotal) + ' less than last month.';
+  } else {
+    monthComparison.textContent = 'The same as last month.';
+  }
+}
+
+// Adds up the expenses of each category, biggest first
+function getExpenseTotalsByCategory() {
+  const groups = [];
+
+  for (let i = 0; i < transactions.length; i++) {
+    const transaction = transactions[i];
+
+    if (transaction.type === 'expense') {
+      let group = null;
+
+      for (let j = 0; j < groups.length; j++) {
+        if (groups[j].category === transaction.category) {
+          group = groups[j];
+        }
+      }
+
+      if (group === null) {
+        groups.push({ category: transaction.category, total: transaction.amount });
+      } else {
+        group.total = group.total + transaction.amount;
+      }
+    }
+  }
+
+  groups.sort(function (first, second) {
+    return second.total - first.total;
+  });
+
+  return groups;
+}
+
+function createChartRow(group, shareOfTotal) {
+  const row = document.createElement('li');
+  row.className = 'chart__row';
+
+  const name = document.createElement('span');
+  name.className = 'chart__name';
+  name.textContent = group.category;
+
+  const value = document.createElement('span');
+  value.className = 'chart__value';
+  value.textContent = formatCurrency(group.total) + ' (' + shareOfTotal + '%)';
+
+  const head = document.createElement('div');
+  head.className = 'chart__head';
+  head.appendChild(name);
+  head.appendChild(value);
+
+  const bar = document.createElement('div');
+  bar.className = 'chart__bar';
+  bar.style.width = shareOfTotal + '%';
+
+  const track = document.createElement('div');
+  track.className = 'chart__track';
+  track.appendChild(bar);
+
+  row.appendChild(head);
+  row.appendChild(track);
+
+  return row;
+}
+
+function renderCategoryChart() {
+  const groups = getExpenseTotalsByCategory();
+
+  categoryChart.innerHTML = '';
+
+  if (groups.length === 0) {
+    categoryChart.classList.add('d-none');
+    chartEmpty.classList.remove('d-none');
+    return;
+  }
+
+  categoryChart.classList.remove('d-none');
+  chartEmpty.classList.add('d-none');
+
+  let totalExpense = 0;
+  for (let i = 0; i < groups.length; i++) {
+    totalExpense = totalExpense + groups[i].total;
+  }
+
+  for (let i = 0; i < groups.length; i++) {
+    const shareOfTotal = Math.round((groups[i].total / totalExpense) * 100);
+    categoryChart.appendChild(createChartRow(groups[i], shareOfTotal));
   }
 }
 
 function render() {
   renderSummary();
   renderTransactions();
+  renderMonthlySummary();
+  renderCategoryChart();
 }
 
 function createOption(value, label) {
@@ -754,7 +922,7 @@ function handleFormSubmit(event) {
 
 function init() {
   transactions = loadTransactions();
-  console.log('Loaded ' + transactions.length + ' saved transactions');
+  console.log('Loaded ' + getTransactionCountText(transactions.length) + ' from local storage');
 
   dateInput.value = getTodayAsInputValue();
   populateCategoryOptions('');
