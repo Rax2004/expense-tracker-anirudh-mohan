@@ -46,3 +46,12 @@ Amounts are shown in rupees. If you want a different currency, `formatCurrency()
 ## Running it
 
 Download or clone the folder and open `index.html` in any browser.
+
+## Credits
+
+The look of the app is based on the [Expenzo Expense Tracker App UI Kit](https://ui8.net/rl-studio/products/expenzo---expense-tracker-app-ui-kit)
+by RL Studio on UI8. I used it as a design reference only, for things like the balance headline, the
+paired summary cards and the bottom tab bar on phones. No files from the kit are used here, the
+HTML and CSS are written from scratch.
+
+Fonts are Plus Jakarta Sans and Inter from Google Fonts.

@@ -45,6 +45,7 @@ const totalExpenseBox = document.getElementById('totalExpense');
 const currentBalanceBox = document.getElementById('currentBalance');
 const incomeCountBox = document.getElementById('incomeCount');
 const expenseCountBox = document.getElementById('expenseCount');
+const balanceCountBox = document.getElementById('balanceCount');
 
 // Transaction list elements
 const listHeading = document.getElementById('list-heading');
@@ -80,7 +81,6 @@ let clickedNavIndex = -1;
 
 // Theme elements
 const themeToggle = document.getElementById('themeToggle');
-const themeToggleLabel = document.getElementById('themeToggleLabel');
 
 // Filter elements
 const filterTypeInputs = document.querySelectorAll('input[name="filterType"]');
@@ -266,6 +266,7 @@ function renderSummary() {
   currentBalanceBox.textContent = formatCurrency(summary.balance);
   incomeCountBox.textContent = getEntryCountText(summary.incomeEntries);
   expenseCountBox.textContent = getEntryCountText(summary.expenseEntries);
+  balanceCountBox.textContent = getEntryCountText(transactions.length);
 
   if (summary.balance < 0) {
     currentBalanceBox.classList.add('is-negative');
@@ -795,11 +796,11 @@ function renderTrendNote(startBalance, endBalance) {
   const change = endBalance - startBalance;
 
   if (change > 0) {
-    trendNote.textContent = 'Balance rose ' + formatCurrency(change) + ' ' + getRangeLabel() + '.';
+    trendNote.textContent = 'Your money went up by ' + formatCurrency(change) + ' ' + getRangeLabel() + '.';
   } else if (change < 0) {
-    trendNote.textContent = 'Balance fell ' + formatCurrency(-change) + ' ' + getRangeLabel() + '.';
+    trendNote.textContent = 'Your money went down by ' + formatCurrency(-change) + ' ' + getRangeLabel() + '.';
   } else {
-    trendNote.textContent = 'Balance did not change ' + getRangeLabel() + '.';
+    trendNote.textContent = 'Your money stayed the same ' + getRangeLabel() + '.';
   }
 }
 
@@ -1285,6 +1286,26 @@ function handleFormSubmit(event) {
   render();
 }
 
+// On wide screens the form and the list sit side by side, so a link can lead to a
+// section that is already on screen. A short outline shows where the click landed.
+function showSectionWasReached(sectionId) {
+  const section = document.getElementById(sectionId);
+
+  if (section === null) {
+    return;
+  }
+
+  section.classList.add('is-target');
+
+  setTimeout(function () {
+    section.classList.remove('is-target');
+  }, 1400);
+
+  if (sectionId === 'add-transaction') {
+    amountInput.focus();
+  }
+}
+
 // Highlights the nav link of whichever section has reached the top of the screen
 function updateActiveNavLink() {
   let activeIndex = 0;
@@ -1330,11 +1351,9 @@ function applyTheme(theme) {
   document.documentElement.setAttribute('data-bs-theme', theme);
 
   if (theme === 'dark') {
-    themeToggleLabel.textContent = 'Light';
-    themeToggle.setAttribute('aria-label', 'Switch to light theme');
+    themeToggle.setAttribute('aria-checked', 'true');
   } else {
-    themeToggleLabel.textContent = 'Dark';
-    themeToggle.setAttribute('aria-label', 'Switch to dark theme');
+    themeToggle.setAttribute('aria-checked', 'false');
   }
 }
 
@@ -1424,6 +1443,7 @@ function init() {
   for (let i = 0; i < navLinks.length; i++) {
     navLinks[i].addEventListener('click', function () {
       clickedNavIndex = i;
+      showSectionWasReached(this.getAttribute('href').slice(1));
     });
   }
 
