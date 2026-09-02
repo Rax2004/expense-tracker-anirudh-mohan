@@ -239,6 +239,17 @@ body {
   color: var(--text-muted);
 }
 
+.form-alert {
+  margin: 0 0 1rem;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid rgba(196, 32, 79, 0.35);
+  border-radius: 10px;
+  background-color: var(--expense-soft);
+  color: var(--expense);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
 .form-label {
   font-weight: 600;
   font-size: 0.82rem;
@@ -528,6 +539,22 @@ legend.form-label {
   margin: 0;
   color: var(--text-muted);
   font-size: 0.85rem;
+}
+
+/* Delete confirmation */
+.modal-content {
+  border: 0;
+  border-radius: var(--radius);
+}
+
+.modal-title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.modal-header,
+.modal-footer {
+  border-color: var(--border);
 }
 
 /* Footer */

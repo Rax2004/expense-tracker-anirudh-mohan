@@ -6,8 +6,8 @@ so the data is still there the next time you open the page. No login, no server,
 
 Track · Control · Grow - Every Rupee Counts!
 
-**Status:** the form, the transaction list, the totals and local storage are working. Edit, delete,
-filtering and form validation are the next things I am wiring up.
+**Status:** all the main features are working. What is left is the optional extras (a monthly
+summary and a category chart) and a final tidy up.
 
 ## What it does
 
@@ -15,12 +15,14 @@ filtering and form validation are the next things I am wiring up.
 - Categories change depending on the type you pick (Salary, Freelance... for income, Food,
   Transport... for expenses)
 - Totals for income, expenses and the balance, recalculated whenever the data changes
+- Edit an entry in the same form, which updates the existing record instead of adding a second one
+- Delete an entry, with a confirmation dialog naming the transaction first
+- Filter by type or by category without touching the saved data
+- Every field is validated in JavaScript, so an invalid entry never reaches local storage
 - Transaction list as a table on desktop, and as stacked cards on phones so nothing gets squeezed
-- A proper empty state instead of a blank box when there is nothing to show
+- A proper empty state instead of a blank box when there is nothing to show, including when a
+  filter has no matches
 - Broken or missing local storage data is ignored instead of crashing the page
-
-Coming with the next checkpoints: editing an entry, deleting with a confirmation, filtering by type
-and category, and the form validation messages.
 
 ## Built with
 

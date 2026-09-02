@@ -27,6 +27,8 @@ const cancelEditBtn = document.getElementById('cancelEditBtn');
 const formHeading = document.getElementById('form-heading');
 const editingBadge = document.getElementById('editingBadge');
 
+const formAlert = document.getElementById('formAlert');
+
 // Places where the validation messages are shown
 const typeError = document.getElementById('typeError');
 const amountError = document.getElementById('amountError');
@@ -52,6 +54,14 @@ const transactionCount = document.getElementById('transactionCount');
 const filterTypeInputs = document.querySelectorAll('input[name="filterType"]');
 const filterCategory = document.getElementById('filterCategory');
 const resetFiltersBtn = document.getElementById('resetFiltersBtn');
+
+// Delete confirmation elements
+const deleteModalElement = document.getElementById('deleteModal');
+const deleteModalName = document.getElementById('deleteModalName');
+const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+
+let deleteModal = null;
+let idToDelete = null;
 
 function formatCurrency(amount) {
   return '₹' + amount.toLocaleString('en-IN', {
@@ -420,6 +430,11 @@ function populateFilterCategories() {
     filterCategory.appendChild(createOption(categoryList[i], categoryList[i]));
   }
 
+  // The chosen category may not belong to the chosen type any more
+  if (categoryList.indexOf(filterCategoryValue) === -1) {
+    filterCategoryValue = 'all';
+  }
+
   filterCategory.value = filterCategoryValue;
 }
 
@@ -430,6 +445,16 @@ function getSelectedType() {
     }
   }
   return '';
+}
+
+function showFormAlert(message) {
+  formAlert.textContent = message;
+  formAlert.classList.remove('d-none');
+}
+
+function hideFormAlert() {
+  formAlert.textContent = '';
+  formAlert.classList.add('d-none');
 }
 
 function clearFormErrors() {
@@ -536,6 +561,162 @@ function addTransaction() {
   console.log('New transaction saved');
 }
 
+function findTransactionIndex(id) {
+  for (let i = 0; i < transactions.length; i++) {
+    if (transactions[i].id === id) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+// Changes the existing record instead of adding a second one
+function updateTransaction() {
+  const index = findTransactionIndex(editingId);
+
+  if (index === -1) {
+    showFormAlert('That transaction no longer exists. It may have been deleted.');
+    return;
+  }
+
+  transactions[index].type = getSelectedType();
+  transactions[index].amount = Number(amountInput.value);
+  transactions[index].category = categoryInput.value;
+  transactions[index].date = dateInput.value;
+  transactions[index].description = descriptionInput.value.trim();
+
+  saveTransactions();
+  console.log('Transaction updated');
+}
+
+function startEdit(id) {
+  const index = findTransactionIndex(id);
+
+  if (index === -1) {
+    showFormAlert('That transaction no longer exists. It may have been deleted.');
+    render();
+    return;
+  }
+
+  const transaction = transactions[index];
+  editingId = id;
+
+  hideFormAlert();
+  clearFormErrors();
+
+  for (let i = 0; i < typeInputs.length; i++) {
+    if (typeInputs[i].value === transaction.type) {
+      typeInputs[i].checked = true;
+    } else {
+      typeInputs[i].checked = false;
+    }
+  }
+
+  populateCategoryOptions(transaction.type);
+  categoryInput.value = transaction.category;
+  amountInput.value = transaction.amount;
+  dateInput.value = transaction.date;
+  descriptionInput.value = transaction.description;
+
+  formHeading.textContent = 'Edit Transaction';
+  submitBtn.textContent = 'Save Changes';
+  cancelEditBtn.classList.remove('d-none');
+  editingBadge.classList.remove('d-none');
+
+  amountInput.focus();
+}
+
+function stopEditing() {
+  editingId = null;
+  formHeading.textContent = 'Add Transaction';
+  submitBtn.textContent = 'Add Transaction';
+  cancelEditBtn.classList.add('d-none');
+  editingBadge.classList.add('d-none');
+}
+
+function askToDelete(id) {
+  const index = findTransactionIndex(id);
+
+  if (index === -1) {
+    render();
+    return;
+  }
+
+  idToDelete = id;
+  deleteModalName.textContent = transactions[index].description;
+  deleteModal.show();
+}
+
+function deleteTransaction(id) {
+  const index = findTransactionIndex(id);
+
+  if (index === -1) {
+    return;
+  }
+
+  transactions.splice(index, 1);
+  saveTransactions();
+  console.log('Transaction deleted');
+
+  if (editingId === id) {
+    stopEditing();
+    resetForm();
+  }
+
+  render();
+}
+
+// One listener on the table handles the buttons of every row
+function handleTableClick(event) {
+  const action = event.target.getAttribute('data-action');
+
+  if (action === null) {
+    return;
+  }
+
+  const id = event.target.getAttribute('data-id');
+
+  if (action === 'edit') {
+    startEdit(id);
+  } else if (action === 'delete') {
+    askToDelete(id);
+  }
+}
+
+function getSelectedFilterType() {
+  for (let i = 0; i < filterTypeInputs.length; i++) {
+    if (filterTypeInputs[i].checked) {
+      return filterTypeInputs[i].value;
+    }
+  }
+  return 'all';
+}
+
+function handleFilterTypeChange() {
+  filterTypeValue = getSelectedFilterType();
+  populateFilterCategories();
+  renderTransactions();
+}
+
+function handleFilterCategoryChange() {
+  filterCategoryValue = filterCategory.value;
+  renderTransactions();
+}
+
+function resetFilters() {
+  filterTypeValue = 'all';
+  filterCategoryValue = 'all';
+
+  for (let i = 0; i < filterTypeInputs.length; i++) {
+    if (filterTypeInputs[i].value === 'all') {
+      filterTypeInputs[i].checked = true;
+    }
+  }
+
+  populateFilterCategories();
+  renderTransactions();
+}
+
 function resetForm() {
   transactionForm.reset();
   clearFormErrors();
@@ -545,12 +726,19 @@ function resetForm() {
 
 function handleFormSubmit(event) {
   event.preventDefault();
+  hideFormAlert();
 
   if (validateForm() === false) {
     return;
   }
 
-  addTransaction();
+  if (editingId === null) {
+    addTransaction();
+  } else {
+    updateTransaction();
+  }
+
+  stopEditing();
   resetForm();
   render();
 }
@@ -570,6 +758,28 @@ function init() {
   }
 
   transactionForm.addEventListener('submit', handleFormSubmit);
+  transactionTableBody.addEventListener('click', handleTableClick);
+
+  cancelEditBtn.addEventListener('click', function () {
+    stopEditing();
+    resetForm();
+    hideFormAlert();
+  });
+
+  deleteModal = new bootstrap.Modal(deleteModalElement);
+
+  confirmDeleteBtn.addEventListener('click', function () {
+    deleteTransaction(idToDelete);
+    idToDelete = null;
+    deleteModal.hide();
+  });
+
+  for (let i = 0; i < filterTypeInputs.length; i++) {
+    filterTypeInputs[i].addEventListener('change', handleFilterTypeChange);
+  }
+
+  filterCategory.addEventListener('change', handleFilterCategoryChange);
+  resetFiltersBtn.addEventListener('click', resetFilters);
 
   render();
   console.log('Spendly is up and running');
