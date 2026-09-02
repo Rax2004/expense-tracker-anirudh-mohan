@@ -38,7 +38,6 @@ const typeError = document.getElementById('typeError');
 const amountError = document.getElementById('amountError');
 const categoryError = document.getElementById('categoryError');
 const dateError = document.getElementById('dateError');
-const descriptionError = document.getElementById('descriptionError');
 
 // Summary elements
 const totalIncomeBox = document.getElementById('totalIncome');
@@ -74,6 +73,10 @@ const trendEmpty = document.getElementById('trendEmpty');
 const trendChart = document.getElementById('trendChart');
 const trendNote = document.getElementById('trendNote');
 const chartRangeInputs = document.querySelectorAll('input[name="chartRange"]');
+
+// Header navigation links
+const navLinks = document.querySelectorAll('.app-nav a');
+let clickedNavIndex = -1;
 
 // Theme elements
 const themeToggle = document.getElementById('themeToggle');
@@ -149,6 +152,7 @@ function isValidTransaction(record) {
     return false;
   }
 
+  // The description is optional, so it is not checked here
   if (typeof record.category !== 'string' || record.category === '') {
     return false;
   }
@@ -156,11 +160,15 @@ function isValidTransaction(record) {
   if (typeof record.date !== 'string' || /^\d{4}-\d{2}-\d{2}$/.test(record.date) === false) {
     return false;
   }
-  if (typeof record.description !== 'string' || record.description === '') {
-    return false;
-  }
-
   return true;
+}
+
+// A saved record may have no description at all, or something that is not text
+function readDescription(record) {
+  if (typeof record.description === 'string') {
+    return record.description.trim();
+  }
+  return '';
 }
 
 function loadTransactions() {
@@ -187,7 +195,7 @@ function loadTransactions() {
           amount: Number(record.amount),
           category: record.category,
           date: record.date,
-          description: record.description,
+          description: readDescription(record),
           createdAt: record.createdAt || ''
         });
       }
@@ -329,12 +337,31 @@ function createCell(label, content, className) {
   return cell;
 }
 
+// The description is optional, so the category stands in when it is empty
+function getTransactionLabel(transaction) {
+  if (transaction.description === '') {
+    return transaction.category;
+  }
+  return transaction.description;
+}
+
+function createDescriptionText(transaction) {
+  if (transaction.description !== '') {
+    return transaction.description;
+  }
+
+  const placeholder = document.createElement('span');
+  placeholder.className = 'no-description';
+  placeholder.textContent = 'No description';
+  return placeholder;
+}
+
 function createActionButton(text, action, transaction) {
   const button = document.createElement('button');
   button.type = 'button';
   button.setAttribute('data-action', action);
   button.setAttribute('data-id', transaction.id);
-  button.setAttribute('aria-label', text + ' transaction: ' + transaction.description);
+  button.setAttribute('aria-label', text + ' transaction: ' + getTransactionLabel(transaction));
   button.textContent = text;
 
   if (action === 'delete') {
@@ -372,7 +399,7 @@ function createTransactionRow(transaction) {
   actions.appendChild(createActionButton('Edit', 'edit', transaction));
   actions.appendChild(createActionButton('Delete', 'delete', transaction));
 
-  row.appendChild(createCell('Description', transaction.description, 'transaction-description'));
+  row.appendChild(createCell('Description', createDescriptionText(transaction), 'transaction-description'));
   row.appendChild(createCell('Category', categoryTag));
   row.appendChild(createCell('Date', formatDate(transaction.date), 'transaction-date'));
   row.appendChild(createCell('Type', typeBadge));
@@ -690,7 +717,7 @@ function getTodayHistory() {
 
     points.push({
       shortLabel: getTimeLabel(ordered[index]),
-      fullLabel: ordered[index].description,
+      fullLabel: getTransactionLabel(ordered[index]),
       balance: balance
     });
 
@@ -1053,14 +1080,6 @@ function validateForm() {
     isValid = false;
   }
 
-  if (descriptionInput.value.trim() === '') {
-    showFieldError(descriptionError, descriptionInput, 'Please enter a description.');
-    if (firstInvalidField === null) {
-      firstInvalidField = descriptionInput;
-    }
-    isValid = false;
-  }
-
   if (firstInvalidField !== null) {
     firstInvalidField.focus();
   }
@@ -1166,7 +1185,7 @@ function askToDelete(id) {
   }
 
   idToDelete = id;
-  deleteModalName.textContent = transactions[index].description;
+  deleteModalName.textContent = getTransactionLabel(transactions[index]);
   deleteModal.show();
 }
 
@@ -1266,6 +1285,47 @@ function handleFormSubmit(event) {
   render();
 }
 
+// Highlights the nav link of whichever section has reached the top of the screen
+function updateActiveNavLink() {
+  let activeIndex = 0;
+  let closestTop = -100000;
+
+  // The section that has passed the top of the screen most recently wins. On wide
+  // screens two sections start at the same height side by side, and then the link
+  // the user actually clicked keeps the highlight.
+  for (let i = 0; i < navLinks.length; i++) {
+    const sectionId = navLinks[i].getAttribute('href').slice(1);
+    const section = document.getElementById(sectionId);
+
+    if (section !== null) {
+      const top = section.getBoundingClientRect().top;
+      const isCloser = top > closestTop;
+      const isClickedTie = top === closestTop && i === clickedNavIndex;
+
+      if (top <= 130 && (isCloser || isClickedTie)) {
+        closestTop = top;
+        activeIndex = i;
+      }
+    }
+  }
+
+  // The last section sits at the bottom of the page and can never reach the top
+  // of the screen, so it is marked active once the page is scrolled all the way down
+  if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 2) {
+    activeIndex = navLinks.length - 1;
+  }
+
+  for (let i = 0; i < navLinks.length; i++) {
+    if (i === activeIndex) {
+      navLinks[i].classList.add('is-active');
+      navLinks[i].setAttribute('aria-current', 'true');
+    } else {
+      navLinks[i].classList.remove('is-active');
+      navLinks[i].removeAttribute('aria-current');
+    }
+  }
+}
+
 function applyTheme(theme) {
   document.documentElement.setAttribute('data-bs-theme', theme);
 
@@ -1361,6 +1421,14 @@ function init() {
   filterCategory.addEventListener('change', handleFilterCategoryChange);
   resetFiltersBtn.addEventListener('click', resetFilters);
   themeToggle.addEventListener('click', toggleTheme);
+  for (let i = 0; i < navLinks.length; i++) {
+    navLinks[i].addEventListener('click', function () {
+      clickedNavIndex = i;
+    });
+  }
+
+  window.addEventListener('scroll', updateActiveNavLink);
+  updateActiveNavLink();
 
   for (let i = 0; i < chartRangeInputs.length; i++) {
     chartRangeInputs[i].addEventListener('change', function () {

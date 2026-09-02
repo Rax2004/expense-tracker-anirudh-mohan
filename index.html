@@ -21,8 +21,15 @@
         <img src="assets/logo.svg" alt="" width="36" height="36">
         <span>Spendly</span>
       </h1>
+      <nav class="app-nav" aria-label="Page sections">
+        <a href="#dashboard">Dashboard</a>
+        <a href="#add-transaction">Add</a>
+        <a href="#transaction-list">Transactions</a>
+        <a href="#reports">Reports</a>
+      </nav>
+
       <div class="app-header__actions">
-        <p class="app-header__tagline">Track &middot; Control &middot; Grow</p>
+        <p class="app-header__tagline d-none d-xl-block">Track &middot; Control &middot; Grow</p>
         <button type="button" class="theme-toggle" id="themeToggle" aria-label="Switch to dark theme">
           <svg class="theme-toggle__icon theme-toggle__icon--moon" viewBox="0 0 24 24" width="16" height="16"
                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -41,7 +48,7 @@
 
   <main class="container-xxl py-4" id="main-content">
 
-    <section class="mb-4" aria-labelledby="summary-heading">
+    <section class="mb-4" id="dashboard" aria-labelledby="summary-heading">
       <h2 class="visually-hidden" id="summary-heading">Account summary</h2>
       <div class="row g-3">
 
@@ -137,7 +144,7 @@
 
     <div class="row g-4">
       <div class="col-12 col-xl-4">
-        <section class="panel form-panel" aria-labelledby="form-heading">
+        <section class="panel form-panel" id="add-transaction" aria-labelledby="form-heading">
           <div class="panel__header">
             <h2 class="panel__title" id="form-heading">Add Transaction</h2>
             <span class="status-pill d-none" id="editingBadge">Editing</span>
@@ -145,7 +152,7 @@
 
           <form class="panel__body" id="transactionForm" novalidate>
             <p class="form-alert d-none" id="formAlert" role="alert"></p>
-            <p class="form-hint">All fields are required.</p>
+            <p class="form-hint">All fields are required except the description.</p>
 
             <fieldset class="mb-3">
               <legend class="form-label">Type</legend>
@@ -183,10 +190,9 @@
             </div>
 
             <div class="mb-4">
-              <label class="form-label" for="description">Description</label>
+              <label class="form-label" for="description">Description <span class="form-label__optional">(optional)</span></label>
               <input type="text" class="form-control" id="description" name="description" maxlength="60"
-                     placeholder="e.g. Monthly grocery shopping" autocomplete="off" aria-describedby="descriptionError">
-              <p class="form-error" id="descriptionError" role="alert"></p>
+                     placeholder="e.g. Monthly grocery shopping" autocomplete="off">
             </div>
 
             <div class="form-actions">
@@ -198,7 +204,7 @@
       </div>
 
       <div class="col-12 col-xl-8">
-        <section class="panel" aria-labelledby="list-heading">
+        <section class="panel" id="transaction-list" aria-labelledby="list-heading">
           <div class="panel__header">
             <h2 class="panel__title" id="list-heading" tabindex="-1">Transactions</h2>
             <span class="count-pill" id="transactionCount" aria-live="polite">0 transactions</span>
@@ -257,7 +263,7 @@
         </section>
       </div>
     </div>
-    <div class="row g-4 mt-0">
+    <div class="row g-4 mt-0" id="reports">
       <div class="col-12 col-xl-4">
         <section class="panel" aria-labelledby="monthly-heading">
           <div class="panel__header">

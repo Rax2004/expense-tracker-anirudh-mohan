@@ -66,7 +66,15 @@ body {
   outline-offset: 2px;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
   *,
   *::before,
   *::after {
@@ -117,6 +125,31 @@ body {
   font-size: 1.35rem;
   font-weight: 700;
   letter-spacing: -0.02em;
+}
+
+.app-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem;
+}
+
+.app-nav a {
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.78);
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.app-nav a:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.app-nav a.is-active {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
 }
 
 .app-header__actions {
@@ -338,6 +371,17 @@ body {
 legend.form-label {
   float: none;
   width: auto;
+}
+
+.form-label__optional {
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.no-description {
+  font-weight: 400;
+  font-style: italic;
+  color: var(--text-muted);
 }
 
 .type-toggle {
@@ -865,10 +909,26 @@ legend.form-label {
   margin: 0;
 }
 
+/* The header stays in view on wider screens, so the nav links are always reachable */
+@media (min-width: 992px) {
+  .app-header {
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+  }
+
+  #dashboard,
+  #add-transaction,
+  #transaction-list,
+  #reports {
+    scroll-margin-top: 6rem;
+  }
+}
+
 @media (min-width: 1200px) {
   .form-panel {
     position: sticky;
-    top: 1.5rem;
+    top: 6rem;
   }
 }
 

@@ -8,7 +8,7 @@ Track · Control · Grow - Every Rupee Counts!
 
 ## What it does
 
-- Add an entry as income or expense with an amount, category, date and a short description
+- Add an entry as income or expense with an amount, category, date and an optional description
 - Categories change depending on the type you pick (Salary, Freelance... for income, Food,
   Transport... for expenses)
 - Totals for income, expenses and the balance, recalculated whenever the data changes
