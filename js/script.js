@@ -1286,26 +1286,6 @@ function handleFormSubmit(event) {
   render();
 }
 
-// On wide screens the form and the list sit side by side, so a link can lead to a
-// section that is already on screen. A short outline shows where the click landed.
-function showSectionWasReached(sectionId) {
-  const section = document.getElementById(sectionId);
-
-  if (section === null) {
-    return;
-  }
-
-  section.classList.add('is-target');
-
-  setTimeout(function () {
-    section.classList.remove('is-target');
-  }, 1400);
-
-  if (sectionId === 'add-transaction') {
-    amountInput.focus();
-  }
-}
-
 // Highlights the nav link of whichever section has reached the top of the screen
 function updateActiveNavLink() {
   let activeIndex = 0;
@@ -1336,6 +1316,10 @@ function updateActiveNavLink() {
     activeIndex = navLinks.length - 1;
   }
 
+  setActiveNavLink(activeIndex);
+}
+
+function setActiveNavLink(activeIndex) {
   for (let i = 0; i < navLinks.length; i++) {
     if (i === activeIndex) {
       navLinks[i].classList.add('is-active');
@@ -1394,6 +1378,7 @@ function toggleTheme() {
 
 function init() {
   applyTheme(loadTheme());
+  document.getElementById('footerYear').textContent = new Date().getFullYear();
   transactions = loadTransactions();
   console.log('Loaded ' + getTransactionCountText(transactions.length) + ' from local storage');
 
@@ -1443,7 +1428,17 @@ function init() {
   for (let i = 0; i < navLinks.length; i++) {
     navLinks[i].addEventListener('click', function () {
       clickedNavIndex = i;
-      showSectionWasReached(this.getAttribute('href').slice(1));
+
+      // A link can point at a section that is already on screen, and then no
+      // scroll happens to update the highlight, so it is set here as well
+      setActiveNavLink(i);
+
+      // The browser moves focus to the linked section first, so this waits its turn
+      if (this.getAttribute('href') === '#add-transaction') {
+        setTimeout(function () {
+          typeInputs[0].focus();
+        }, 350);
+      }
     });
   }
 
