@@ -32,7 +32,7 @@
       <div class="row g-3">
 
         <div class="col-12 col-sm-6 col-lg-4">
-          <div class="summary-card summary-card--income">
+          <div class="summary-card summary-card--income" aria-live="polite" aria-atomic="true">
             <span class="summary-card__icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M3 17 L9 11 L13 15 L21 7"></path>
@@ -48,7 +48,7 @@
         </div>
 
         <div class="col-12 col-sm-6 col-lg-4">
-          <div class="summary-card summary-card--expense">
+          <div class="summary-card summary-card--expense" aria-live="polite" aria-atomic="true">
             <span class="summary-card__icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M3 7 L9 13 L13 9 L21 17"></path>
@@ -64,7 +64,7 @@
         </div>
 
         <div class="col-12 col-lg-4">
-          <div class="summary-card summary-card--balance">
+          <div class="summary-card summary-card--balance" aria-live="polite" aria-atomic="true">
             <span class="summary-card__icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M3 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2"></path>
@@ -148,8 +148,8 @@
       <div class="col-12 col-xl-8">
         <section class="panel" aria-labelledby="list-heading">
           <div class="panel__header">
-            <h2 class="panel__title" id="list-heading">Transactions</h2>
-            <span class="count-pill" id="transactionCount">0 transactions</span>
+            <h2 class="panel__title" id="list-heading" tabindex="-1">Transactions</h2>
+            <span class="count-pill" id="transactionCount" aria-live="polite">0 transactions</span>
           </div>
 
           <div class="filters">

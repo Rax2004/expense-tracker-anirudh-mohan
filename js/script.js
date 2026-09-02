@@ -44,6 +44,7 @@ const incomeCountBox = document.getElementById('incomeCount');
 const expenseCountBox = document.getElementById('expenseCount');
 
 // Transaction list elements
+const listHeading = document.getElementById('list-heading');
 const transactionTable = document.getElementById('transactionTable');
 const transactionTableBody = document.getElementById('transactionTableBody');
 const emptyState = document.getElementById('emptyState');
@@ -62,12 +63,20 @@ const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
 
 let deleteModal = null;
 let idToDelete = null;
+let deleteWasConfirmed = false;
 
+// A negative balance reads better as -₹500.00 than ₹-500.00
 function formatCurrency(amount) {
-  return '₹' + amount.toLocaleString('en-IN', {
+  const formatted = Math.abs(amount).toLocaleString('en-IN', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
   });
+
+  if (amount < 0) {
+    return '-₹' + formatted;
+  }
+
+  return '₹' + formatted;
 }
 
 // The date input gives a value like 2026-09-02, so the parts are read directly
@@ -769,9 +778,18 @@ function init() {
   deleteModal = new bootstrap.Modal(deleteModalElement);
 
   confirmDeleteBtn.addEventListener('click', function () {
+    deleteWasConfirmed = true;
     deleteTransaction(idToDelete);
     idToDelete = null;
     deleteModal.hide();
+  });
+
+  // The deleted row and its buttons are gone, so keyboard focus needs a new home
+  deleteModalElement.addEventListener('hidden.bs.modal', function () {
+    if (deleteWasConfirmed) {
+      deleteWasConfirmed = false;
+      listHeading.focus();
+    }
   });
 
   for (let i = 0; i < filterTypeInputs.length; i++) {

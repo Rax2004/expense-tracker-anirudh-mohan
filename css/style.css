@@ -31,6 +31,15 @@ body {
   outline-offset: 2px;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 .skip-link {
   position: absolute;
   left: -9999px;
@@ -638,6 +647,11 @@ legend.form-label {
 
   .row-actions .btn {
     min-width: 4.75rem;
+    min-height: 38px;
+  }
+
+  .btn-filter {
+    padding: 0.4rem 1.05rem;
   }
 
   .summary-card__value {
