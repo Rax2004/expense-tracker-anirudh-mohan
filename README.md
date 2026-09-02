@@ -39,31 +39,4 @@ Amounts are shown in rupees. If you want a different currency, `formatCurrency()
 
 ## Running it
 
-Download or clone the folder and open `index.html` in any browser. There is nothing to install.
-
-## How the data is saved
-
-All transactions sit in one array. Every time it changes it gets written to local storage under the
-key `expenseTrackerTransactions` using `JSON.stringify()`. On page load it is read back with
-`JSON.parse()` inside a `try / catch`, and every record is checked before it is used, so a missing
-key or edited/broken data just gives you an empty list instead of a broken page.
-
-Each transaction looks like this:
-
-```json
-{
-  "id": "1788369588254",
-  "type": "expense",
-  "amount": 1250.5,
-  "category": "Food",
-  "date": "2026-09-02",
-  "description": "Groceries for the week",
-  "createdAt": "2026-09-02T17:19:48.254Z"
-}
-```
-
-## Accessibility
-
-Labels on every field, buttons with real text, a visible focus ring, a skip link, and the totals sit
-in polite live regions so a screen reader hears them change. Income and expense are not told apart
-by colour alone - each row also carries a text badge and a + or - in front of the amount.
+Download or clone the folder and open `index.html` in any browser.
