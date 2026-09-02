@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -21,7 +21,21 @@
         <img src="assets/logo.svg" alt="" width="36" height="36">
         <span>Spendly</span>
       </h1>
-      <p class="app-header__tagline">Track &middot; Control &middot; Grow</p>
+      <div class="app-header__actions">
+        <p class="app-header__tagline">Track &middot; Control &middot; Grow</p>
+        <button type="button" class="theme-toggle" id="themeToggle" aria-label="Switch to dark theme">
+          <svg class="theme-toggle__icon theme-toggle__icon--moon" viewBox="0 0 24 24" width="16" height="16"
+               fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"></path>
+          </svg>
+          <svg class="theme-toggle__icon theme-toggle__icon--sun" viewBox="0 0 24 24" width="16" height="16"
+               fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+          </svg>
+          <span id="themeToggleLabel">Dark</span>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -82,6 +96,44 @@
 
       </div>
     </section>
+
+    <div class="row g-4 mb-4">
+      <div class="col-12">
+        <section class="panel" aria-labelledby="trend-heading">
+          <div class="panel__header">
+            <h2 class="panel__title" id="trend-heading">Balance Trend</h2>
+            <div class="filter-group" role="group" aria-label="Chart time range">
+              <input type="radio" class="btn-check" name="chartRange" id="range1d" value="1d" autocomplete="off">
+              <label class="btn btn-filter" for="range1d">1D</label>
+              <input type="radio" class="btn-check" name="chartRange" id="range1m" value="1m" autocomplete="off">
+              <label class="btn btn-filter" for="range1m">1M</label>
+              <input type="radio" class="btn-check" name="chartRange" id="range6m" value="6m" checked autocomplete="off">
+              <label class="btn btn-filter" for="range6m">6M</label>
+              <input type="radio" class="btn-check" name="chartRange" id="range1y" value="1y" autocomplete="off">
+              <label class="btn btn-filter" for="range1y">1Y</label>
+            </div>
+          </div>
+          <div class="panel__body">
+            <div class="trend-chart" id="trendChart">
+              <div class="trend-chart__scale" aria-hidden="true">
+                <span id="trendHigh">&#8377;0.00</span>
+                <span id="trendLow">&#8377;0.00</span>
+              </div>
+              <div class="trend-chart__area">
+                <div class="trend-chart__plot" id="trendPlot"></div>
+                <div class="trend-chart__labels" id="trendLabels" aria-hidden="true"></div>
+              </div>
+            </div>
+
+            <ul class="visually-hidden" id="trendSummary"></ul>
+
+            <p class="trend-chart__note" id="trendNote"></p>
+
+            <p class="chart-empty d-none" id="trendEmpty">No transactions to chart yet.</p>
+          </div>
+        </section>
+      </div>
+    </div>
 
     <div class="row g-4">
       <div class="col-12 col-xl-4">

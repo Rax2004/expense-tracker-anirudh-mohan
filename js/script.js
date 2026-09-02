@@ -1,5 +1,9 @@
-// Key used to save the transactions inside the browser local storage
+// Keys used to save data inside the browser local storage
 const STORAGE_KEY = 'expenseTrackerTransactions';
+const THEME_KEY = 'spendlyTheme';
+
+// Which time range the balance trend chart is showing: 1m, 6m or 1y
+let chartRange = '6m';
 
 // Categories are kept here so new ones can be added in one place
 const CATEGORIES = {
@@ -59,6 +63,21 @@ const previousMonthExpense = document.getElementById('previousMonthExpense');
 const monthComparison = document.getElementById('monthComparison');
 const categoryChart = document.getElementById('categoryChart');
 const chartEmpty = document.getElementById('chartEmpty');
+
+// Balance trend elements
+const trendPlot = document.getElementById('trendPlot');
+const trendHigh = document.getElementById('trendHigh');
+const trendLow = document.getElementById('trendLow');
+const trendLabels = document.getElementById('trendLabels');
+const trendSummary = document.getElementById('trendSummary');
+const trendEmpty = document.getElementById('trendEmpty');
+const trendChart = document.getElementById('trendChart');
+const trendNote = document.getElementById('trendNote');
+const chartRangeInputs = document.querySelectorAll('input[name="chartRange"]');
+
+// Theme elements
+const themeToggle = document.getElementById('themeToggle');
+const themeToggleLabel = document.getElementById('themeToggleLabel');
 
 // Filter elements
 const filterTypeInputs = document.querySelectorAll('input[name="filterType"]');
@@ -145,13 +164,13 @@ function isValidTransaction(record) {
 }
 
 function loadTransactions() {
-  const savedData = localStorage.getItem(STORAGE_KEY);
-
-  if (savedData === null) {
-    return [];
-  }
-
   try {
+    const savedData = localStorage.getItem(STORAGE_KEY);
+
+    if (savedData === null) {
+      return [];
+    }
+
     const savedList = JSON.parse(savedData);
 
     if (Array.isArray(savedList) === false) {
@@ -543,11 +562,338 @@ function renderCategoryChart() {
   }
 }
 
+function getSignedAmount(transaction) {
+  if (transaction.type === 'income') {
+    return transaction.amount;
+  }
+  return -transaction.amount;
+}
+
+// One point per period: single days for the 1M range, whole months for 6M and 1Y
+function buildChartPeriods(range) {
+  const periods = [];
+
+  if (range === '1m') {
+    const today = new Date();
+
+    for (let i = 29; i >= 0; i--) {
+      const day = new Date(today.getFullYear(), today.getMonth(), today.getDate() - i);
+      const key = day.getFullYear() + '-' + padTwoDigits(day.getMonth() + 1) + '-' + padTwoDigits(day.getDate());
+
+      periods.push({
+        key: key,
+        shortLabel: String(day.getDate()),
+        fullLabel: formatDate(key)
+      });
+    }
+
+    return periods;
+  }
+
+  let monthsToShow = 6;
+  if (range === '1y') {
+    monthsToShow = 12;
+  }
+
+  const monthKeys = [];
+  let monthKey = getMonthKey(getTodayAsInputValue());
+
+  for (let i = 0; i < monthsToShow; i++) {
+    monthKeys.unshift(monthKey);
+    monthKey = getPreviousMonthKey(monthKey);
+  }
+
+  for (let i = 0; i < monthKeys.length; i++) {
+    periods.push({
+      key: monthKeys[i],
+      shortLabel: MONTH_NAMES[Number(monthKeys[i].split('-')[1]) - 1],
+      fullLabel: getMonthLabel(monthKeys[i])
+    });
+  }
+
+  return periods;
+}
+
+// Walks through the transactions in date order and records the balance left at
+// the end of every period, which is what the line is drawn from
+function getBalanceHistory(periods) {
+  // 2026-09 for a month, 2026-09-02 for a day, so a date can be cut to the same length
+  const keyLength = periods[0].key.length;
+  const ordered = sortByNewestFirst(transactions).reverse();
+  const points = [];
+  let balance = 0;
+  let index = 0;
+
+  // Keys are written so that they can be compared as plain text. Anything older
+  // than the first period shown only sets the starting balance.
+  while (index < ordered.length && ordered[index].date.slice(0, keyLength) < periods[0].key) {
+    balance = balance + getSignedAmount(ordered[index]);
+    index = index + 1;
+  }
+
+  const startBalance = balance;
+
+  for (let i = 0; i < periods.length; i++) {
+    while (index < ordered.length && ordered[index].date.slice(0, keyLength) === periods[i].key) {
+      balance = balance + getSignedAmount(ordered[index]);
+      index = index + 1;
+    }
+
+    points.push({
+      shortLabel: periods[i].shortLabel,
+      fullLabel: periods[i].fullLabel,
+      balance: balance
+    });
+  }
+
+  return { startBalance: startBalance, points: points };
+}
+
+// createdAt holds the moment the entry was saved, which is used as the time of day
+function getTimeLabel(transaction) {
+  if (transaction.createdAt === '') {
+    return '';
+  }
+
+  const stamp = new Date(transaction.createdAt);
+
+  if (isNaN(stamp.getTime())) {
+    return '';
+  }
+
+  return padTwoDigits(stamp.getHours()) + ':' + padTwoDigits(stamp.getMinutes());
+}
+
+// The one day view has a point for the opening balance and one for every entry made today
+function getTodayHistory() {
+  const today = getTodayAsInputValue();
+  const ordered = sortByNewestFirst(transactions).reverse();
+  const points = [];
+  let balance = 0;
+  let index = 0;
+
+  while (index < ordered.length && ordered[index].date < today) {
+    balance = balance + getSignedAmount(ordered[index]);
+    index = index + 1;
+  }
+
+  const startBalance = balance;
+
+  points.push({
+    shortLabel: 'Start',
+    fullLabel: 'Start of ' + formatDate(today),
+    balance: balance
+  });
+
+  while (index < ordered.length && ordered[index].date === today) {
+    balance = balance + getSignedAmount(ordered[index]);
+
+    points.push({
+      shortLabel: getTimeLabel(ordered[index]),
+      fullLabel: ordered[index].description,
+      balance: balance
+    });
+
+    index = index + 1;
+  }
+
+  // Nothing was added today, so the line stays flat from the start to now
+  if (points.length === 1) {
+    points.push({
+      shortLabel: 'Now',
+      fullLabel: 'No entries today',
+      balance: balance
+    });
+  }
+
+  return { startBalance: startBalance, points: points };
+}
+
+function getChartHistory() {
+  if (chartRange === '1d') {
+    return getTodayHistory();
+  }
+  return getBalanceHistory(buildChartPeriods(chartRange));
+}
+
+// With many points there is no room to label every one of them
+function getLabelStep(count) {
+  if (count <= 8) {
+    return 1;
+  }
+  if (count <= 14) {
+    return 2;
+  }
+  return 5;
+}
+
+// Turns an amount into a distance from the top of the chart
+function getTopPercent(value, highest, lowest) {
+  return ((highest - value) / (highest - lowest)) * 100;
+}
+
+// The line is drawn inside a 100 by 100 box that is stretched to fill the panel
+function buildLinePath(points, highest, lowest) {
+  const stepX = 100 / (points.length - 1);
+  let path = '';
+
+  for (let i = 0; i < points.length; i++) {
+    const x = i * stepX;
+    const y = getTopPercent(points[i].balance, highest, lowest);
+
+    if (i === 0) {
+      path = 'M ' + x + ' ' + y;
+    } else {
+      path = path + ' L ' + x + ' ' + y;
+    }
+  }
+
+  return path;
+}
+
+function getRangeLabel() {
+  if (chartRange === '1d') {
+    return 'today';
+  }
+  if (chartRange === '1m') {
+    return 'over the last 30 days';
+  }
+  if (chartRange === '1y') {
+    return 'over the last year';
+  }
+  return 'over the last 6 months';
+}
+
+function renderTrendNote(startBalance, endBalance) {
+  const change = endBalance - startBalance;
+
+  if (change > 0) {
+    trendNote.textContent = 'Balance rose ' + formatCurrency(change) + ' ' + getRangeLabel() + '.';
+  } else if (change < 0) {
+    trendNote.textContent = 'Balance fell ' + formatCurrency(-change) + ' ' + getRangeLabel() + '.';
+  } else {
+    trendNote.textContent = 'Balance did not change ' + getRangeLabel() + '.';
+  }
+}
+
+function renderBalanceChart() {
+  trendPlot.innerHTML = '';
+  trendLabels.innerHTML = '';
+  trendSummary.innerHTML = '';
+
+  if (transactions.length === 0) {
+    trendChart.classList.add('d-none');
+    trendNote.classList.add('d-none');
+    trendEmpty.classList.remove('d-none');
+    return;
+  }
+
+  trendChart.classList.remove('d-none');
+  trendNote.classList.remove('d-none');
+  trendEmpty.classList.add('d-none');
+
+  const history = getChartHistory();
+  const points = history.points;
+  const labelStep = getLabelStep(points.length);
+
+  // The chart scales to the balance range it is showing, otherwise small moves
+  // would be invisible next to a large balance
+  let highest = history.startBalance;
+  let lowest = history.startBalance;
+
+  for (let i = 0; i < points.length; i++) {
+    if (points[i].balance > highest) {
+      highest = points[i].balance;
+    }
+    if (points[i].balance < lowest) {
+      lowest = points[i].balance;
+    }
+  }
+
+  // A completely flat line would divide by zero, so give it some room
+  if (highest === lowest) {
+    highest = highest + 100;
+    lowest = lowest - 100;
+  }
+
+  // Breathing space at the top, and at the bottom only while the floor stays
+  // positive, so the chart never invents a negative balance the account never had
+  const padding = (highest - lowest) * 0.08;
+  highest = highest + padding;
+
+  if (lowest > 0) {
+    lowest = lowest - padding;
+
+    if (lowest < 0) {
+      lowest = 0;
+    }
+  }
+
+  trendHigh.textContent = formatCurrency(highest);
+  trendLow.textContent = formatCurrency(lowest);
+
+  trendPlot.className = 'trend-chart__plot';
+
+  if (points[points.length - 1].balance < history.startBalance) {
+    trendPlot.classList.add('trend-chart__plot--down');
+  }
+
+  if (points.length > 8) {
+    trendPlot.classList.add('trend-chart__plot--dense');
+    trendLabels.classList.add('trend-chart__labels--dense');
+  } else {
+    trendLabels.classList.remove('trend-chart__labels--dense');
+  }
+
+  const linePath = buildLinePath(points, highest, lowest);
+
+  trendPlot.innerHTML =
+    '<svg class="trend-chart__svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">' +
+    '<path class="trend-chart__fill" d="' + linePath + ' L 100 100 L 0 100 Z"></path>' +
+    '<path class="trend-chart__line" d="' + linePath + '" vector-effect="non-scaling-stroke"></path>' +
+    '</svg>';
+
+  if (lowest < 0 && highest > 0) {
+    const zeroLine = document.createElement('div');
+    zeroLine.className = 'trend-chart__zero';
+    zeroLine.style.top = getTopPercent(0, highest, lowest) + '%';
+    trendPlot.appendChild(zeroLine);
+  }
+
+  const stepX = 100 / (points.length - 1);
+
+  for (let i = 0; i < points.length; i++) {
+    const dot = document.createElement('span');
+    dot.className = 'trend-point';
+    dot.style.left = (i * stepX) + '%';
+    dot.style.top = getTopPercent(points[i].balance, highest, lowest) + '%';
+    dot.title = points[i].fullLabel + ': ' + formatCurrency(points[i].balance);
+    trendPlot.appendChild(dot);
+
+    const label = document.createElement('span');
+    label.className = 'trend-chart__label';
+
+    // Counted from the newest point, so the latest period is always named
+    if ((points.length - 1 - i) % labelStep === 0) {
+      label.textContent = points[i].shortLabel;
+    }
+
+    trendLabels.appendChild(label);
+
+    const summaryItem = document.createElement('li');
+    summaryItem.textContent = points[i].fullLabel + ': ' + formatCurrency(points[i].balance);
+    trendSummary.appendChild(summaryItem);
+  }
+
+  renderTrendNote(history.startBalance, points[points.length - 1].balance);
+}
+
 function render() {
   renderSummary();
   renderTransactions();
   renderMonthlySummary();
   renderCategoryChart();
+  renderBalanceChart();
 }
 
 function createOption(value, label) {
@@ -920,7 +1266,55 @@ function handleFormSubmit(event) {
   render();
 }
 
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-bs-theme', theme);
+
+  if (theme === 'dark') {
+    themeToggleLabel.textContent = 'Light';
+    themeToggle.setAttribute('aria-label', 'Switch to light theme');
+  } else {
+    themeToggleLabel.textContent = 'Dark';
+    themeToggle.setAttribute('aria-label', 'Switch to dark theme');
+  }
+}
+
+// Uses the saved choice first, and falls back to the setting of the operating system
+function loadTheme() {
+  try {
+    const savedTheme = localStorage.getItem(THEME_KEY);
+
+    if (savedTheme === 'dark' || savedTheme === 'light') {
+      return savedTheme;
+    }
+  } catch (error) {
+    console.error('The saved theme could not be read.', error);
+  }
+
+  if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    return 'dark';
+  }
+
+  return 'light';
+}
+
+function toggleTheme() {
+  let theme = 'dark';
+
+  if (document.documentElement.getAttribute('data-bs-theme') === 'dark') {
+    theme = 'light';
+  }
+
+  applyTheme(theme);
+
+  try {
+    localStorage.setItem(THEME_KEY, theme);
+  } catch (error) {
+    console.error('The theme choice could not be saved.', error);
+  }
+}
+
 function init() {
+  applyTheme(loadTheme());
   transactions = loadTransactions();
   console.log('Loaded ' + getTransactionCountText(transactions.length) + ' from local storage');
 
@@ -966,6 +1360,14 @@ function init() {
 
   filterCategory.addEventListener('change', handleFilterCategoryChange);
   resetFiltersBtn.addEventListener('click', resetFilters);
+  themeToggle.addEventListener('click', toggleTheme);
+
+  for (let i = 0; i < chartRangeInputs.length; i++) {
+    chartRangeInputs[i].addEventListener('change', function () {
+      chartRange = this.value;
+      renderBalanceChart();
+    });
+  }
 
   render();
   console.log('Spendly is up and running');

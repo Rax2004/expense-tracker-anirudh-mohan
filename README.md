@@ -21,11 +21,17 @@ Track · Control · Grow - Every Rupee Counts!
   filter has no matches
 - Broken or missing local storage data is ignored instead of crashing the page
 
-Two extras on top of that:
+A few extras on top of that:
 
 - **Monthly expenses** - this month against last month, with the difference written out
 - **Spending by category** - a bar chart of where the money went, built with plain HTML and CSS
   rather than a chart library, and redrawn whenever a transaction is added, edited or deleted
+- **Balance trend** - a line chart of the balance with 1 day, 1 month, 6 month and 1 year views,
+  drawn with a plain SVG path instead of a chart library. The 1 day view plots every entry made
+  today by the time it was added. Green when the balance ended the period higher than it started,
+  red when it ended lower
+- **Dark mode** - a toggle in the header that follows your system setting by default and remembers
+  your choice
 
 ## Built with
 

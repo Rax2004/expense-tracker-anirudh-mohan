@@ -13,10 +13,45 @@
   --income-soft: #e6f7f1;
   --expense: #c4204f;
   --expense-soft: #fdeaf0;
+  --hover-bg: #f7fafd;
+  --art-colour: #b9c6da;
+  --trend-up: #12a97a;
+  --trend-down: #ef4b2b;
   --radius: 16px;
   --shadow-sm: 0 1px 2px rgba(16, 32, 63, 0.05);
   --shadow-md: 0 8px 24px rgba(16, 32, 63, 0.08);
   --shadow-brand: 0 10px 26px rgba(15, 42, 95, 0.28);
+  color-scheme: light;
+}
+
+/* Bootstrap 5.3 reads data-bs-theme too, so its own components follow the same switch */
+[data-bs-theme="dark"] {
+  --app-bg: #0c1424;
+  --surface: #131d33;
+  --surface-muted: #1a2540;
+  --border: #26324f;
+  --text: #e9eefb;
+  --text-muted: #94a5c4;
+  --accent: #5b86ff;
+  --accent-dark: #3f6bef;
+  --income: #2fd39b;
+  --income-soft: rgba(47, 211, 155, 0.14);
+  --expense: #ff6f8d;
+  --expense-soft: rgba(255, 111, 141, 0.14);
+  --hover-bg: #1a2540;
+  --art-colour: #3c4a68;
+  --trend-up: #2fd39b;
+  --trend-down: #ff5c3a;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 10px 28px rgba(0, 0, 0, 0.45);
+  --shadow-brand: 0 12px 30px rgba(0, 0, 0, 0.5);
+  color-scheme: dark;
+
+  /* Bootstrap's own components read these, so they follow the same palette */
+  --bs-body-bg: #0c1424;
+  --bs-body-color: #e9eefb;
+  --bs-border-color: #26324f;
+  --bs-secondary-color: rgba(233, 238, 251, 0.7);
 }
 
 body {
@@ -82,6 +117,34 @@ body {
   font-size: 1.35rem;
   font-weight: 700;
   letter-spacing: -0.02em;
+}
+
+.app-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.theme-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+[data-bs-theme="dark"] .theme-toggle__icon--moon,
+[data-bs-theme="light"] .theme-toggle__icon--sun {
+  display: none;
 }
 
 .app-header__tagline {
@@ -198,6 +261,7 @@ body {
 
 .panel__header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
@@ -239,6 +303,12 @@ body {
   background-color: #fff4e5;
   border: 1px solid #f5c68a;
   color: #92400e;
+}
+
+[data-bs-theme="dark"] .status-pill {
+  background-color: rgba(245, 158, 11, 0.16);
+  border-color: rgba(245, 158, 11, 0.45);
+  color: #fbbf5c;
 }
 
 /* Form */
@@ -286,7 +356,7 @@ legend.form-label {
 }
 
 .btn-type:hover {
-  background-color: #eaf0f8;
+  background-color: var(--hover-bg);
   color: var(--text);
 }
 
@@ -445,7 +515,7 @@ legend.form-label {
 }
 
 .transaction-table tbody tr:hover {
-  background-color: #f7fafd;
+  background-color: var(--hover-bg);
 }
 
 .transaction-row--income td:first-child {
@@ -529,13 +599,13 @@ legend.form-label {
   margin: 1.25rem;
   padding: 2.5rem 1.25rem;
   text-align: center;
-  border: 1px dashed #cfd9e8;
+  border: 1px dashed var(--border);
   border-radius: var(--radius);
   background-color: var(--surface-muted);
 }
 
 .empty-state__art {
-  color: #b9c6da;
+  color: var(--art-colour);
   margin-bottom: 0.85rem;
 }
 
@@ -660,10 +730,117 @@ legend.form-label {
   font-size: 0.85rem;
 }
 
+/* Balance trend line chart */
+.trend-chart {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.trend-chart__scale {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 190px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.trend-chart__area {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.trend-chart__plot {
+  position: relative;
+  height: 190px;
+}
+
+.trend-chart__svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.trend-chart__line {
+  fill: none;
+  stroke: var(--trend-up);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.trend-chart__fill {
+  stroke: none;
+  fill: var(--trend-up);
+  opacity: 0.14;
+}
+
+.trend-chart__plot--down .trend-chart__line {
+  stroke: var(--trend-down);
+}
+
+.trend-chart__plot--down .trend-chart__fill {
+  fill: var(--trend-down);
+}
+
+.trend-point {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--surface);
+  border: 2px solid var(--trend-up);
+  transform: translate(-50%, -50%);
+}
+
+.trend-chart__plot--down .trend-point {
+  border-color: var(--trend-down);
+}
+
+.trend-chart__plot--dense .trend-point {
+  width: 5px;
+  height: 5px;
+  border-width: 1.5px;
+}
+
+.trend-chart__zero {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px dashed var(--text-muted);
+  opacity: 0.4;
+}
+
+.trend-chart__labels {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.trend-chart__label {
+  flex: 1 1 0;
+  min-width: 0;
+  text-align: center;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.trend-chart__note {
+  margin: 1rem 0 0;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
 /* Delete confirmation */
 .modal-content {
   border: 0;
   border-radius: var(--radius);
+  background-color: var(--surface);
 }
 
 .modal-title {
