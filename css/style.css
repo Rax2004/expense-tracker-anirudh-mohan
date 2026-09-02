@@ -1,31 +1,33 @@
 :root {
-  --app-bg: #f4f6f9;
+  --app-bg: #f2f5fa;
   --surface: #ffffff;
-  --surface-muted: #f8fafc;
-  --border: #e3e8ef;
-  --text: #16202f;
-  --text-muted: #64748b;
-  --brand: #1e3a5f;
-  --accent: #2563eb;
-  --accent-dark: #1d4ed8;
-  --income: #15803d;
-  --income-soft: #e8f6ed;
-  --expense: #b42318;
-  --expense-soft: #fdecea;
-  --radius: 12px;
-  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.05);
-  --shadow-md: 0 6px 20px rgba(16, 24, 40, 0.07);
+  --surface-muted: #f5f8fc;
+  --border: #e2e8f2;
+  --text: #10203f;
+  --text-muted: #5f7089;
+  --brand: #0f2a5f;
+  --brand-teal: #12b886;
+  --accent: #2450db;
+  --accent-dark: #1b3fb8;
+  --income: #0b7a5b;
+  --income-soft: #e6f7f1;
+  --expense: #c4204f;
+  --expense-soft: #fdeaf0;
+  --radius: 16px;
+  --shadow-sm: 0 1px 2px rgba(16, 32, 63, 0.05);
+  --shadow-md: 0 8px 24px rgba(16, 32, 63, 0.08);
+  --shadow-brand: 0 10px 26px rgba(15, 42, 95, 0.28);
 }
 
 body {
   background-color: var(--app-bg);
   color: var(--text);
-  font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
-  font-size: 0.95rem;
+  font-family: "Poppins", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+  font-size: 0.9rem;
 }
 
 :focus-visible {
-  outline: 3px solid rgba(37, 99, 235, 0.45);
+  outline: 3px solid rgba(36, 80, 219, 0.45);
   outline-offset: 2px;
 }
 
@@ -49,8 +51,10 @@ body {
 /* Header */
 .app-header {
   background-color: var(--brand);
+  background-image: linear-gradient(115deg, #0f2a5f 0%, #123b63 45%, #10614f 100%);
+  border-bottom: 3px solid var(--brand-teal);
   color: #ffffff;
-  padding: 0.9rem 0;
+  padding: 1rem 0;
 }
 
 .app-header__inner {
@@ -64,57 +68,85 @@ body {
 .app-brand {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.65rem;
   margin: 0;
-  font-size: 1.15rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .app-header__tagline {
   margin: 0;
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
 }
 
 /* Summary cards */
 .summary-card {
   height: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
   background-color: var(--surface);
   border: 1px solid var(--border);
-  border-left: 4px solid var(--text-muted);
   border-radius: var(--radius);
   box-shadow: var(--shadow-sm);
-  padding: 1rem 1.25rem;
+  padding: 1.15rem 1.25rem;
+}
+
+.summary-card__icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+}
+
+.summary-card__text {
+  min-width: 0;
 }
 
 .summary-card__label {
-  margin: 0 0 0.3rem;
-  font-size: 0.75rem;
+  margin: 0 0 0.15rem;
+  font-size: 0.7rem;
   font-weight: 600;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--text-muted);
 }
 
 .summary-card__value {
   margin: 0;
-  font-size: 1.6rem;
+  font-size: 1.7rem;
   font-weight: 700;
+  letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
 }
 
-.summary-card--income {
-  border-left-color: var(--income);
+.summary-card__meta {
+  margin: 0.2rem 0 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.summary-card--income .summary-card__icon {
+  background-color: var(--income-soft);
+  color: var(--income);
 }
 
 .summary-card--income .summary-card__value {
   color: var(--income);
 }
 
-.summary-card--expense {
-  border-left-color: var(--expense);
+.summary-card--expense .summary-card__icon {
+  background-color: var(--expense-soft);
+  color: var(--expense);
 }
 
 .summary-card--expense .summary-card__value {
@@ -122,15 +154,28 @@ body {
 }
 
 .summary-card--balance {
-  border-left-color: var(--accent);
+  border-color: transparent;
+  background-image: linear-gradient(135deg, #0f2a5f 0%, #12406e 55%, #0e6b58 100%);
+  box-shadow: var(--shadow-brand);
+  color: #ffffff;
+}
+
+.summary-card--balance .summary-card__icon {
+  background-color: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+}
+
+.summary-card--balance .summary-card__label,
+.summary-card--balance .summary-card__meta {
+  color: rgba(255, 255, 255, 0.72);
 }
 
 .summary-card--balance .summary-card__value {
-  color: var(--brand);
+  color: #ffffff;
 }
 
-.summary-card__value.is-negative {
-  color: var(--expense);
+.summary-card--balance .summary-card__value.is-negative {
+  color: #ffb3c4;
 }
 
 /* Panels */
@@ -147,14 +192,15 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  padding: 0.9rem 1.25rem;
+  padding: 1rem 1.25rem;
   border-bottom: 1px solid var(--border);
 }
 
 .panel__title {
   margin: 0;
-  font-size: 1rem;
+  font-size: 1.02rem;
   font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .panel__body {
@@ -168,9 +214,9 @@ body {
 .count-pill,
 .status-pill {
   border-radius: 999px;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 600;
-  padding: 0.2rem 0.65rem;
+  padding: 0.25rem 0.7rem;
   white-space: nowrap;
 }
 
@@ -187,9 +233,15 @@ body {
 }
 
 /* Form */
+.form-hint {
+  margin: 0 0 1rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
 .form-label {
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   margin-bottom: 0.35rem;
 }
 
@@ -209,10 +261,12 @@ legend.form-label {
   border: 1px solid var(--border);
   color: var(--text-muted);
   font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0.5rem 0.75rem;
 }
 
 .btn-type:hover {
-  background-color: #eef2f7;
+  background-color: #eaf0f8;
   color: var(--text);
 }
 
@@ -228,31 +282,35 @@ legend.form-label {
   color: var(--expense);
 }
 
-.btn-check:focus-visible + .btn-type {
-  outline: 3px solid rgba(37, 99, 235, 0.45);
+.btn-check:focus-visible + .btn-type,
+.btn-check:focus-visible + .btn-filter {
+  outline: 3px solid rgba(36, 80, 219, 0.45);
   outline-offset: 2px;
 }
 
 .form-control,
 .form-select {
   border-color: var(--border);
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
 }
 
 .form-control:focus,
 .form-select:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.15);
+  box-shadow: 0 0 0 0.2rem rgba(36, 80, 219, 0.15);
 }
 
 .input-group-text {
   background-color: var(--surface-muted);
   border-color: var(--border);
   color: var(--text-muted);
+  font-weight: 600;
 }
 
 .form-error {
   margin: 0.35rem 0 0;
-  font-size: 0.8125rem;
+  font-size: 0.78rem;
   font-weight: 500;
   color: var(--expense);
 }
@@ -269,6 +327,8 @@ legend.form-label {
 
 .form-actions .btn {
   flex: 1 1 10rem;
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
 }
 
 .btn-primary {
@@ -276,9 +336,10 @@ legend.form-label {
   --bs-btn-border-color: var(--accent);
   --bs-btn-hover-bg: var(--accent-dark);
   --bs-btn-hover-border-color: var(--accent-dark);
-  --bs-btn-active-bg: #1e40af;
-  --bs-btn-active-border-color: #1e40af;
+  --bs-btn-active-bg: #17359b;
+  --bs-btn-active-border-color: #17359b;
   font-weight: 600;
+  box-shadow: 0 4px 12px rgba(36, 80, 219, 0.25);
 }
 
 /* Filters */
@@ -288,39 +349,73 @@ legend.form-label {
   border-bottom: 1px solid var(--border);
 }
 
-.filters__field {
-  flex: 1 1 10rem;
-  min-width: 9rem;
+.filter-group {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
 }
 
-.form-label-sm {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+.btn-filter {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.3rem 0.95rem;
+  font-size: 0.8rem;
+  font-weight: 600;
   color: var(--text-muted);
-  margin-bottom: 0.2rem;
+  background-color: transparent;
+}
+
+.btn-filter:hover {
+  background-color: var(--surface-muted);
+  color: var(--text);
+}
+
+.btn-check:checked + .btn-filter {
+  background-color: var(--brand);
+  color: #ffffff;
+}
+
+.filters__field {
+  min-width: 11rem;
 }
 
 /* Transaction table */
 .transaction-table {
   --bs-table-bg: transparent;
   margin-bottom: 0;
+  font-size: 0.86rem;
+}
+
+/* Keeps the description column readable instead of letting it collapse to one word per line */
+.transaction-table th:first-child,
+.transaction-table tbody td:first-child {
+  width: 34%;
+  min-width: 175px;
+  padding-left: 1rem;
 }
 
 .transaction-table thead th {
   background-color: var(--surface-muted);
   color: var(--text-muted);
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   border-bottom: 1px solid var(--border);
-  padding: 0.7rem 1rem;
+  padding: 0.7rem 0.65rem;
   white-space: nowrap;
 }
 
+.transaction-table th:last-child,
+.transaction-table tbody td:last-child {
+  padding-right: 1rem;
+}
+
 .transaction-table tbody td {
-  padding: 0.85rem 1rem;
+  padding: 0.8rem 0.65rem;
   border-bottom: 1px solid var(--border);
   vertical-align: middle;
 }
@@ -329,9 +424,21 @@ legend.form-label {
   border-bottom: 0;
 }
 
+.transaction-table tbody tr:hover {
+  background-color: #f7fafd;
+}
+
+.transaction-row--income td:first-child {
+  box-shadow: inset 3px 0 0 var(--income);
+}
+
+.transaction-row--expense td:first-child {
+  box-shadow: inset 3px 0 0 var(--expense);
+}
+
 .transaction-description {
   font-weight: 600;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 
 .transaction-date {
@@ -343,9 +450,9 @@ legend.form-label {
   display: inline-block;
   background-color: var(--surface-muted);
   border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 0.15rem 0.5rem;
-  font-size: 0.8rem;
+  border-radius: 7px;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.78rem;
   color: var(--text-muted);
 }
 
@@ -353,25 +460,26 @@ legend.form-label {
   display: inline-block;
   border-radius: 999px;
   border: 1px solid transparent;
-  font-size: 0.75rem;
+  font-size: 0.73rem;
   font-weight: 600;
-  padding: 0.15rem 0.6rem;
+  padding: 0.2rem 0.65rem;
 }
 
 .type-badge--income {
   background-color: var(--income-soft);
-  border-color: rgba(21, 128, 61, 0.3);
+  border-color: rgba(11, 122, 91, 0.3);
   color: var(--income);
 }
 
 .type-badge--expense {
   background-color: var(--expense-soft);
-  border-color: rgba(180, 35, 24, 0.3);
+  border-color: rgba(196, 32, 79, 0.3);
   color: var(--expense);
 }
 
 .transaction-amount {
   font-weight: 700;
+  font-size: 0.95rem;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -390,14 +498,25 @@ legend.form-label {
   justify-content: flex-end;
 }
 
+.row-actions .btn {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.3rem 0.6rem;
+}
+
 /* Empty state */
 .empty-state {
   margin: 1.25rem;
-  padding: 2.25rem 1.25rem;
+  padding: 2.5rem 1.25rem;
   text-align: center;
-  border: 1px dashed var(--border);
+  border: 1px dashed #cfd9e8;
   border-radius: var(--radius);
   background-color: var(--surface-muted);
+}
+
+.empty-state__art {
+  color: #b9c6da;
+  margin-bottom: 0.85rem;
 }
 
 .empty-state__title {
@@ -408,10 +527,22 @@ legend.form-label {
 .empty-state__hint {
   margin: 0;
   color: var(--text-muted);
-  font-size: 0.875rem;
+  font-size: 0.85rem;
 }
 
-@media (min-width: 992px) {
+/* Footer */
+.app-footer {
+  padding: 1.75rem 0 2.25rem;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.app-footer p {
+  margin: 0;
+}
+
+@media (min-width: 1200px) {
   .form-panel {
     position: sticky;
     top: 1.5rem;
@@ -434,10 +565,19 @@ legend.form-label {
   /* Width is left to the block layout: a fixed 100% would push the row past its panel. */
   .transaction-table tr {
     border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 0.75rem 0.9rem;
+    border-radius: 14px;
+    padding: 0.8rem 0.95rem;
     margin: 0.75rem 1rem;
     background-color: var(--surface);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .transaction-row--income {
+    border-left: 4px solid var(--income);
+  }
+
+  .transaction-row--expense {
+    border-left: 4px solid var(--expense);
   }
 
   .transaction-table tbody td {
@@ -449,11 +589,17 @@ legend.form-label {
     border-bottom: 0;
   }
 
+  .transaction-table tbody td:first-child {
+    box-shadow: none;
+    width: auto;
+    min-width: 0;
+  }
+
   .transaction-table tbody td::before {
     content: attr(data-label);
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     font-weight: 700;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--text-muted);
     flex: 0 0 auto;
@@ -468,6 +614,10 @@ legend.form-label {
   }
 
   .summary-card__value {
-    font-size: 1.45rem;
+    font-size: 1.5rem;
+  }
+
+  .filters__field {
+    flex: 1 1 auto;
   }
 }

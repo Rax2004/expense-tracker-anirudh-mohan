@@ -1,6 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="Expense Tracker">
-  <rect width="32" height="32" rx="8" fill="#2563eb"/>
-  <rect x="7" y="18" width="4" height="7" rx="1.5" fill="#ffffff" opacity="0.65"/>
-  <rect x="14" y="13" width="4" height="12" rx="1.5" fill="#ffffff"/>
-  <rect x="21" y="8" width="4" height="17" rx="1.5" fill="#ffffff" opacity="0.85"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" role="img" aria-label="Spendly">
+  <defs>
+    <linearGradient id="spendlyMark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f2a5f"/>
+      <stop offset="0.55" stop-color="#13508a"/>
+      <stop offset="1" stop-color="#12b886"/>
+    </linearGradient>
+  </defs>
+  <rect width="48" height="48" rx="12" fill="url(#spendlyMark)"/>
+  <path d="M11 19.5 L19 12.5 L24.5 17 L33.5 9" fill="none" stroke="#ffffff" stroke-width="2.6"
+        stroke-linecap="round" stroke-linejoin="round" opacity="0.92"/>
+  <path d="M28 9 H34 V15" fill="none" stroke="#ffffff" stroke-width="2.6"
+        stroke-linecap="round" stroke-linejoin="round" opacity="0.92"/>
+  <rect x="9" y="24" width="30" height="16" rx="4.5" fill="#ffffff"/>
+  <path d="M28.5 28.5 H39 V35.5 H28.5 a3.5 3.5 0 0 1 0 -7 Z" fill="#12b886"/>
+  <circle cx="31.5" cy="32" r="1.9" fill="#ffffff"/>
 </svg>
