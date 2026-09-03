@@ -2,9 +2,7 @@
 
 Spendly is a small expense tracker I built for a coding assignment. You add what you earn and what
 you spend, and it keeps a running balance for you. Everything lives in the browser's local storage,
-so the data is still there the next time you open the page. No login, no server, no database.
-
-Track · Control · Grow - Every Rupee Counts!
+so the data is still there the next time you open the page.
 
 ## What it does
 
@@ -49,9 +47,8 @@ Download or clone the folder and open `index.html` in any browser.
 
 ## Credits
 
-The look of the app is based on the [Expenzo Expense Tracker App UI Kit](https://ui8.net/rl-studio/products/expenzo---expense-tracker-app-ui-kit)
-by RL Studio on UI8. I used it as a design reference only, for things like the balance headline, the
-paired summary cards and the bottom tab bar on phones. No files from the kit are used here, the
-HTML and CSS are written from scratch.
+The look of the app is based on the Expenzo Expense Tracker App UI Kit by RL Studio on UI8. I used it as a design reference only, for things like the balance headline, the paired summary cards and the bottom tab bar on phones. No files from the kit are used here, the HTML and CSS are written from scratch.
+
+The Spendly name and the Spendly logo were created with the assistance of ChatGPT by OpenAI.
 
 Fonts are Plus Jakarta Sans and Inter from Google Fonts.
